@@ -2,16 +2,18 @@ from django import forms
 from django.forms import inlineformset_factory
 from .models import ServiceOrder, Equipment, ServiceMaterial, SERVICE_TYPES
 
+# opciones + "otro"
 TIPOS_CHOICES = SERVICE_TYPES + [("otro", "Otro (especifique)")]
 
 class ServiceOrderForm(forms.ModelForm):
-    # ✅ Checkboxes múltiples + campo "Otro"
+    # ✅ múltiple
     tipos_servicio = forms.MultipleChoiceField(
         choices=TIPOS_CHOICES,
         required=False,
         widget=forms.CheckboxSelectMultiple,
         label="Tipo(s) de servicio",
     )
+    # ✅ texto para "otro"
     tipo_servicio_otro = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "Especifique otro tipo…"})
@@ -24,7 +26,7 @@ class ServiceOrderForm(forms.ModelForm):
             "contacto_nombre", "tipos_servicio", "tipo_servicio_otro", "ingeniero_nombre",
             "titulo", "actividades", "comentarios",
             "equipo_marca", "equipo_modelo", "equipo_serie", "equipo_descripcion",
-            # "resguardo",  # ❌ no se muestra
+            # ❌ NO incluir 'resguardo'
             "horas", "costo_mxn", "costo_no_aplica", "costo_se_cotizara",
             "reagenda", "reagenda_fecha", "reagenda_hora", "reagenda_motivo",
         ]
@@ -41,24 +43,23 @@ class ServiceOrderForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Inicializa checkboxes con lo guardado
+        # inicializa checkboxes
         if self.instance and self.instance.pk:
             self.fields["tipos_servicio"].initial = self.instance.tipos_servicio or []
 
-        # Bootstrap
-        for name, field in self.fields.items():
+        # clases Bootstrap
+        for _, field in self.fields.items():
             w = field.widget
-            if isinstance(w, (forms.CheckboxInput,)):
+            if isinstance(w, forms.CheckboxInput):
                 w.attrs["class"] = (w.attrs.get("class", "") + " form-check-input").strip()
-            elif isinstance(w, (forms.CheckboxSelectMultiple,)):
-                # se estiliza por HTML/CSS
+            elif isinstance(w, forms.CheckboxSelectMultiple):
                 pass
             elif isinstance(w, (forms.Select, forms.SelectMultiple)):
                 w.attrs["class"] = (w.attrs.get("class", "") + " form-select").strip()
             else:
                 w.attrs["class"] = (w.attrs.get("class", "") + " form-control").strip()
 
-        # Placeholders
+        # placeholders
         self.fields["cliente_nombre"].widget.attrs["placeholder"] = "Nombre del cliente"
         self.fields["ubicacion"].widget.attrs["placeholder"] = "Dirección o sitio"
         self.fields["contacto_nombre"].widget.attrs["placeholder"] = "Persona de contacto"
@@ -78,13 +79,14 @@ class ServiceOrderForm(forms.ModelForm):
         seleccionados = self.cleaned_data.get("tipos_servicio") or []
         inst.tipos_servicio = [v for v in seleccionados if v != "otro"]
         inst.tipo_servicio_otro = (self.cleaned_data.get("tipo_servicio_otro") or "").strip()
-        # Compatibilidad con el campo viejo: guarda el primero o vacío
+        # compat con campo viejo: toma el primero o vacío
         inst.tipo_servicio = inst.tipos_servicio[0] if inst.tipos_servicio else ""
         if commit:
             inst.save()
         return inst
 
 
+# formsets
 EquipmentFormSet = inlineformset_factory(
     parent_model=ServiceOrder,
     model=Equipment,
@@ -102,3 +104,4 @@ ServiceMaterialFormSet = inlineformset_factory(
     extra=1,
     can_delete=True,
 )
+# --- IGNORE ---

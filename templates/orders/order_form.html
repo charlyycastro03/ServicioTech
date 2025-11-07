@@ -41,19 +41,12 @@
               {{ form.contacto_nombre }}
             </div>
 
-            <!-- ✅ Tipo(s) de servicio (checkboxes) -->
+            <!-- ✅ Tipo(s) de servicio (múltiple) -->
             <div class="col-md-8">
-              <label class="form-label d-block">Tipo(s) de servicio</label>
-              <div class="row g-2">
-                {% for cb in form.tipos_servicio %}
-                  <div class="col-6 col-md-4">
-                    <div class="form-check">
-                      {{ cb.tag }}
-                      <label class="form-check-label" for="{{ cb.id_for_label }}">{{ cb.choice_label }}</label>
-                    </div>
-                  </div>
-                {% endfor %}
-              </div>
+             <label class="form-label d-block">Tipo(s) de servicio</label>
+             <div class="checkgrid">
+               {{ form.tipos_servicio }}  {# imprime todos los checkboxes #}
+             </div>
             </div>
 
             <!-- ✅ Otro (especifique) -->

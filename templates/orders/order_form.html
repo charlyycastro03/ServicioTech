@@ -57,7 +57,7 @@
             </div>
 
             <!-- ✅ Otro (especifique) -->
-            <div class="col-md-4 oculto-otro" id="otro-wrapper">
+            <div class="col-md-4" id="otro-wrapper" style="display:none;">
               <label class="form-label">Otro (especifique)</label>
               {{ form.tipo_servicio_otro }}
             </div>
@@ -91,7 +91,7 @@
                 <table class="table table-sm table-striped mb-0 formset-table">
                   <thead class="table-light">
                     <tr>
-                      <th>Marca</th><th>Modelo</th><th>Serie</th><th>Descripción</th><th class="col-action-width"></th>
+                      <th>Marca</th><th>Modelo</th><th>Serie</th><th>Descripción</th><th style="width:1%"></th>
                     </tr>
                   </thead>
                   <tbody id="equipos-body">
@@ -102,7 +102,7 @@
                       <td>{{ f.modelo }}</td>
                       <td>{{ f.serie }}</td>
                       <td>{{ f.descripcion }}</td>
-                      <td class="text-end col-action-width">
+                      <td class="text-end">
                         {% if f.instance.pk %}{{ f.DELETE }}{% endif %}
                         <button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button>
                       </td>
@@ -117,7 +117,7 @@
                   <td>__FIELD__:modelo</td>
                   <td>__FIELD__:serie</td>
                   <td>__FIELD__:descripcion</td>
-                  <td class="text-end col-action-width"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button></td>
+                  <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button></td>
                 </tr>
               </template>
             </div>
@@ -126,7 +126,7 @@
       </div>
     </div>
 
-    <!-- C) ACTIVIDADES -->
+    <!-- C) ACTIVIDADES Y COMENTARIOS -->
     <div class="accordion-item">
       <h2 class="accordion-header" id="headingActividades">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseActividades" aria-expanded="false" aria-controls="collapseActividades">
@@ -226,7 +226,7 @@
                 <table class="table table-sm table-striped mb-0 formset-table">
                   <thead class="table-light">
                     <tr>
-                      <th>Descripción</th><th>Cantidad</th><th>Comentarios</th><th class="col-action-width"></th>
+                      <th>Descripción</th><th>Cantidad</th><th>Comentarios</th><th style="width:1%"></th>
                     </tr>
                   </thead>
                   <tbody id="materiales-body">
@@ -234,9 +234,9 @@
                     {% for f in materiales_fs %}
                     <tr class="formset-row">
                       <td>{{ f.descripcion }}</td>
-                      <td class="cantidad-maxwidth">{{ f.cantidad }}</td>
+                      <td style="max-width:120px;">{{ f.cantidad }}</td>
                       <td>{{ f.comentarios }}</td>
-                      <td class="text-end col-action-width">
+                      <td class="text-end">
                         {% if f.instance.pk %}{{ f.DELETE }}{% endif %}
                         <button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button>
                       </td>
@@ -248,9 +248,9 @@
               <template id="materiales-empty">
                 <tr class="formset-row">
                   <td>__FIELD__:descripcion</td>
-                  <td class="cantidad-maxwidth">__FIELD__:cantidad</td>
+                  <td>__FIELD__:cantidad</td>
                   <td>__FIELD__:comentarios</td>
-                  <td class="text-end col-action-width"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button></td>
+                  <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" data-remove-row>&times;</button></td>
                 </tr>
               </template>
             </div>
@@ -289,7 +289,7 @@
 
 {% block scripts %}
 <script>
-// Mostrar/ocultar "Otro (especifique)" — ahora usando clases en lugar de style
+// Mostrar/ocultar "Otro (especifique)"
 document.addEventListener('DOMContentLoaded', function(){
   const wrapper = document.getElementById('otro-wrapper');
   const otroInput = document.getElementById('id_tipo_servicio_otro');
@@ -297,13 +297,8 @@ document.addEventListener('DOMContentLoaded', function(){
   function refresh() {
     const checks = document.querySelectorAll('input[name="tipos_servicio"]');
     const otroOn = Array.from(checks).some(ch => ch.value === 'otro' && ch.checked);
-    if (!wrapper) return;
-    if (otroOn) {
-      wrapper.classList.remove('oculto-otro');
-    } else {
-      wrapper.classList.add('oculto-otro');
-      if (otroInput) otroInput.value = '';
-    }
+    wrapper.style.display = otroOn ? '' : 'none';
+    if (!otroOn && otroInput) otroInput.value = '';
   }
 
   document.querySelectorAll('input[name="tipos_servicio"]').forEach(ch => {
